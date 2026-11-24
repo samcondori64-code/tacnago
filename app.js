@@ -47,49 +47,199 @@ const P = {
   money:'M12 6a6 6 0 100 12 6 6 0 000-12zm0 2c.6 0 1 .4 1 1h1v1h-2.5a.5.5 0 000 1h1a2.5 2.5 0 010 5H13v1h-1v-1h-1v-1h2.5a.5.5 0 000-1h-1a2.5 2.5 0 010-5H12V8z',
   foot:'M7 3c1.7 0 3 2 3 4.5S8.7 12 7 12s-3-2-3-4.5S5.3 3 7 3zm10 3c1.4 0 2.5 1.7 2.5 3.8S18.4 13.5 17 13.5 14.5 11.9 14.5 9.8 15.6 6 17 6zM4 14h6v4a3 3 0 01-6 0v-4zm10 1.5h6V19a3 3 0 01-6 0v-3.5z',
   id:'M3 5h18a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1zm5 3a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4 17c0-2 2-3 4-3s4 1 4 3H4zm10-8h6v2h-6V9zm0 4h6v2h-6v-2z',
+  mountain:'M2 20h20L14.5 6l-3.8 6.6L8.2 9 2 20zm13-13.6l.5-.9.5.9-.5.3-.5-.3z',
+  village:'M12 3l9 7h-2.5v11h-5v-6h-3v6h-5V10H3l9-7z',
+  logout:'M10 3H5a2 2 0 00-2 2v14a2 2 0 002 2h5v-2H5V5h5V3zm6.5 4.5L15 9l2 2H9v2h8l-2 2 1.5 1.5L21 12l-4.5-4.5z',
+  up:'M12 7l6 6-1.4 1.4L12 9.8l-4.6 4.6L6 13l6-6z',
+  down:'M12 17l-6-6 1.4-1.4L12 14.2l4.6-4.6L18 11l-6 6z',
+  mail:'M3 5h18a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1zm1.5 2L12 12l7.5-5h-15z',
+  lock:'M12 2a5 5 0 00-5 5v3H6a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V11a1 1 0 00-1-1h-1V7a5 5 0 00-5-5zm-3 8V7a3 3 0 116 0v3H9zm3 4a1.5 1.5 0 01.8 2.8V19h-1.6v-2.2A1.5 1.5 0 0112 14z',
+  target:'M12 2v3.1A7 7 0 005.1 12H2v2h3.1A7 7 0 0012 20.9V24h2v-3.1A7 7 0 0020.9 14H24v-2h-3.1A7 7 0 0014 5.1V2h-2zm1 5.2A4.8 4.8 0 1112 16.8 4.8 4.8 0 0113 7.2zm-1 2.8a2 2 0 100 4 2 2 0 000-4z',
+  flag:'M5 3h2v18H5V3zm3 1h11l-2.5 4L19 12H8V4z',
+  play:'M8 5l11 7-11 7V5z',
   chevron:'M9 6l6 6-6 6',
   arrowl:'M15 6l-6 6 6 6'
 };
 function ico(n, s=18, sw){
   const d = P[n] || P.info;
-  if(n==='sun'||n==='chevron'||n==='arrowl') return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+  if(n==='sun'||n==='chevron'||n==='arrowl'||n==='up'||n==='down') return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
   return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="${d}"/></svg>`;
 }
 
-/* ---------------- ESTADO ---------------- */
-const KEY = 'tacnago_v1';
-const defaultProfile = () => ({ stamps:[], points:0, reviews:[], plan:[], coupons:[], lastDay:null, photos:{} });
+/* ---------------- ESTADO Y CUENTAS ---------------- */
+const KEY = 'tacnago_v2';
+const OLDKEY = 'tacnago_v1';
+
+const defaultProfile = () => ({
+  stamps:[], points:0, reviews:[], plan:[], coupons:[], lastDay:null, photos:{},
+  routesDone:[], tour:{ active:false, idx:0 }
+});
 
 let S = {
   lang:'es', theme:'dark', tab:'home', view:null,
-  user:'user_wylliam',
-  q:'', cat:'all', food:'all', bus:'all',
-  routeOnMap:null, detail:null,
-  profiles:{}, chat:[]
+  user:null,                 // correo de la cuenta con sesión abierta
+  accounts:{}, profiles:{},
+  q:'', cat:'all', food:'all', bus:'all', zone:'all',
+  routeOnMap:null, detail:null, chat:[],
+  authMode:'in', authMsg:'', geo:null, geoState:'off'
 };
+
+/* Hash simple para guardar la contraseña sin dejarla en texto plano.
+   Es un prototipo local: no sustituye a un servidor de autenticación real. */
+function hashPass(txt){
+  let a = 0x811c9dc5, b = 0x9e3779b9;
+  const str = 'tacnago::' + txt;
+  for(let i=0;i<str.length;i++){
+    const c = str.charCodeAt(i);
+    a = Math.imul(a ^ c, 0x01000193);
+    b = Math.imul(b + c, 0x85ebca6b) ^ (b >>> 13);
+  }
+  return ((a>>>0).toString(16).padStart(8,'0')) + ((b>>>0).toString(16).padStart(8,'0'));
+}
+
+function seedAccounts(){
+  USERS.forEach(u=>{
+    if(!S.accounts[u.email]){
+      S.accounts[u.email] = {
+        email:u.email, name:u.name, fullName:u.fullName,
+        role:u.role, roleEn:u.roleEn, avatar:u.avatar, color:u.color,
+        badge:u.badge, badgeEn:u.badgeEn, pass:hashPass(SEED_PASSWORD), team:true
+      };
+    }
+    if(!S.profiles[u.email]) S.profiles[u.email] = defaultProfile();
+  });
+}
+
+function migrateV1(){
+  try{
+    const raw = localStorage.getItem(OLDKEY);
+    if(!raw) return;
+    const old = JSON.parse(raw);
+    if(!old.profiles) return;
+    USERS.forEach(u=>{
+      const prev = old.profiles[u.id];
+      if(prev && S.profiles[u.email]){
+        const cur = S.profiles[u.email];
+        if(!cur.stamps.length && !cur.points){
+          Object.keys(prev).forEach(k=>{ cur[k] = prev[k]; });
+        }
+      }
+    });
+    if(old.lang) S.lang = old.lang;
+    if(old.theme) S.theme = old.theme;
+  }catch(e){}
+}
 
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
-    if(raw){ const d = JSON.parse(raw); Object.assign(S, d); }
+    if(raw) Object.assign(S, JSON.parse(raw));
   }catch(e){ console.warn('Sin almacenamiento previo'); }
-  USERS.forEach(u=>{
-    if(!S.profiles[u.id]) S.profiles[u.id] = defaultProfile();
+  if(!S.accounts) S.accounts = {};
+  if(!S.profiles) S.profiles = {};
+  seedAccounts();
+  migrateV1();
+  // completar campos que falten en perfiles guardados con versiones anteriores
+  Object.keys(S.profiles).forEach(k=>{
     const d = defaultProfile();
-    Object.keys(d).forEach(k=>{ if(S.profiles[u.id][k] === undefined) S.profiles[u.id][k] = d[k]; });
+    Object.keys(d).forEach(f=>{ if(S.profiles[k][f] === undefined) S.profiles[k][f] = d[f]; });
   });
+  if(S.user && !S.accounts[S.user]) S.user = null;
 }
+
 function save(){
   try{
     localStorage.setItem(KEY, JSON.stringify({
-      lang:S.lang, theme:S.theme, user:S.user, profiles:S.profiles
+      lang:S.lang, theme:S.theme, user:S.user, accounts:S.accounts, profiles:S.profiles
     }));
   }catch(e){}
 }
-const me = () => S.profiles[S.user];
-const meUser = () => USERS.find(u=>u.id===S.user);
+
+const me = () => S.profiles[S.user] || defaultProfile();
+const meUser = () => S.accounts[S.user] || { name:'—', avatar:'?', color:'#64748B', role:'', roleEn:'' };
 const t = k => (I18N[S.lang][k] || I18N.es[k] || k);
 const EN = () => S.lang==='en';
+
+/* Devuelve los datos de quien firmó una reseña, sea cuenta nueva o semilla */
+function who(id){
+  if(S.accounts[id]) return S.accounts[id];
+  const u = USERS.find(x=>x.id===id);
+  if(u && S.accounts[u.email]) return S.accounts[u.email];
+  return { name:'Visitante', avatar:'V', color:'#64748B', role:'', roleEn:'' };
+}
+
+/* ---------- Autenticación local ---------- */
+function doLogin(email, pass){
+  email = (email||'').trim().toLowerCase();
+  const acc = S.accounts[email];
+  if(!acc || acc.pass !== hashPass(pass||'')){
+    S.authMsg = t('wrongPass'); render(); return;
+  }
+  S.user = email; S.authMsg = ''; S.tab = 'home'; S.view = null;
+  save(); render(); dailyStreak();
+  toast(t('welcomeBack') + ', ' + acc.name, 'good');
+}
+
+function doRegister(name, email, pass){
+  name = (name||'').trim();
+  email = (email||'').trim().toLowerCase();
+  if(!name || !email || !pass){ S.authMsg = t('fillAll'); render(); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ S.authMsg = t('badEmail'); render(); return; }
+  if(pass.length < 6){ S.authMsg = t('shortPass'); render(); return; }
+  if(S.accounts[email]){ S.authMsg = t('emailTaken'); render(); return; }
+
+  const palette = ['#C2182B','#1D6FD0','#8B3FD0','#0E8F6B','#C47F17','#D4452A','#50607A'];
+  const initials = name.trim().split(/\s+/).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  S.accounts[email] = {
+    email, name:name.split(/\s+/)[0], fullName:name,
+    role:'Visitante de TacnaGo', roleEn:'TacnaGo visitor',
+    avatar:initials || name[0].toUpperCase(),
+    color:palette[Object.keys(S.accounts).length % palette.length],
+    badge:'Nuevo explorador', badgeEn:'New explorer',
+    pass:hashPass(pass), team:false
+  };
+  S.profiles[email] = defaultProfile();
+  S.user = email; S.authMsg = ''; S.tab = 'home'; S.view = null;
+  save(); render(); dailyStreak();
+  toast(t('accountCreated') + ' · ' + S.accounts[email].name, 'good');
+}
+
+function doLogout(){
+  S.user = null; S.authMode = 'in'; S.authMsg = ''; S.view = null; S.tab = 'home';
+  save(); render();
+}
+
+function switchUser(email){
+  if(!S.accounts[email]) return;
+  S.user = email; S.view = null;
+  save(); render();
+  toast((EN()?'Profile: ':'Perfil: ') + S.accounts[email].name, 'good');
+}
+function toggleLang(){ S.lang = S.lang==='es'?'en':'es'; save(); render(); }
+function toggleTheme(){ S.theme = S.theme==='dark'?'light':'dark'; save(); render(); }
+
+/* ---------- Geolocalización ---------- */
+function locate(){
+  if(!navigator.geolocation){ toast(EN()?'Location not available':'Ubicación no disponible'); return; }
+  S.geoState = 'wait'; render();
+  navigator.geolocation.getCurrentPosition(
+    p=>{ S.geo = { lat:p.coords.latitude, lng:p.coords.longitude }; S.geoState='ok'; render();
+         toast(EN()?'Location found':'Ubicación obtenida','good'); },
+    ()=>{ S.geoState = 'deny'; render();
+          toast(EN()?'Could not get your location':'No se pudo obtener tu ubicación'); },
+    { enableHighAccuracy:true, timeout:10000, maximumAge:60000 }
+  );
+}
+function haversine(a, b){
+  const R = 6371000, rad = x => x*Math.PI/180;
+  const dLat = rad(b.lat-a.lat), dLng = rad(b.lng-a.lng);
+  const h = Math.sin(dLat/2)**2 + Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+function fmtDist(m){
+  if(m < 1000) return Math.round(m/10)*10 + ' m';
+  return (m/1000).toFixed(m < 10000 ? 1 : 0) + ' km';
+}
 
 /* ---------------- UTILIDADES ---------------- */
 const place = id => PLACES.find(p=>p.id===id);
@@ -143,7 +293,10 @@ const CATART = {
   cafeterias:{ g:['#6B4A12','#C47F17','#8E5A14'], glyph:'coffee' },
   restaurantes:{ g:['#7A1F12','#D4452A','#9E3A14'], glyph:'utensils' },
   comerciales:{ g:['#123A6B','#1D6FD0','#1A2E6B'], glyph:'bag' },
-  ferias:{ g:['#3F1A6B','#8B3FD0','#5A1F7A'], glyph:'cart' }
+  ferias:{ g:['#3F1A6B','#8B3FD0','#5A1F7A'], glyph:'cart' },
+  naturaleza:{ g:['#0A5B45','#0E8F6B','#13624C'], glyph:'mountain' },
+  provincias:{ g:['#6B3C15','#9A5B2E','#4F2E12'], glyph:'village' },
+  servicios:{ g:['#2C3A4F','#50607A','#1F2938'], glyph:'bus' }
 };
 function headerArt(p, h=120){
   const photo = (me().photos||{})[p.id];
@@ -178,7 +331,8 @@ function filtered(){
     const okC = S.cat==='all' || p.cat===S.cat;
     const okF = S.food==='all' || p.food===S.food;
     const okB = S.bus==='all' || p.bus.includes(S.bus);
-    return okQ && okC && okF && okB;
+    const okZ = S.zone==='all' || p.zone===S.zone;
+    return okQ && okC && okF && okB && okZ;
   });
 }
 const allBusLines = [...new Set(PLACES.flatMap(p=>p.bus))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
@@ -188,13 +342,97 @@ const allBusLines = [...new Set(PLACES.flatMap(p=>p.bus))].sort((a,b)=>a.localeC
    ========================================================================== */
 function render(){
   document.documentElement.setAttribute('data-theme', S.theme);
-  renderHeader();
+  const app = document.getElementById('app');
   const main = document.getElementById('main');
+
+  if(!S.user){
+    app.classList.add('auth');
+    document.getElementById('hdr').innerHTML = '';
+    document.getElementById('nav').innerHTML = '';
+    document.getElementById('tourbar').innerHTML = '';
+    main.innerHTML = screenAuth();
+    return;
+  }
+  app.classList.remove('auth');
+  renderHeader();
   main.innerHTML = S.view ? viewScreen() : tabScreen();
   renderNav();
+  renderTourBar();
   if(S.tab==='map' && !S.view) initMap();
   main.scrollTop = 0;
   window.scrollTo(0,0);
+  // deja visible el filtro activo dentro de las tiras horizontales
+  setTimeout(()=>{
+    document.querySelectorAll('.scroller').forEach(sc=>{
+      const on = sc.querySelector('.pill.on');
+      if(on && on.scrollIntoView) on.scrollIntoView({ inline:'center', block:'nearest' });
+    });
+  }, 30);
+}
+
+/* ================= PANTALLA DE INICIO DE SESIÓN ================= */
+function screenAuth(){
+  const f = S.authForm || {};
+  const reg = S.authMode === 'up';
+  return `<div class="authwrap">
+    <div class="authlogo">${ico('compass',34)}</div>
+    <h1 class="authtitle">TacnaGo <span>2026</span></h1>
+    <p class="authsub">${EN()?'The best of Tacna in one place':'Lo mejor de Tacna en un solo lugar'}</p>
+
+    <div class="authcard">
+      <div class="authtabs">
+        <button class="${!reg?'on':''}" onclick="S.authMode='in';S.authMsg='';render()">${t('signIn')}</button>
+        <button class="${reg?'on':''}" onclick="S.authMode='up';S.authMsg='';render()">${t('signUp')}</button>
+      </div>
+
+      ${reg? `<label class="fld">${ico('user',14)}
+        <input id="au_name" type="text" placeholder="${t('yourName')}" value="${esc(f.name||'')}"
+          oninput="authKeep()"></label>`:''}
+
+      <label class="fld">${ico('mail',14)}
+        <input id="au_mail" type="email" inputmode="email" autocomplete="username"
+          placeholder="${t('email')}" value="${esc(f.email||'')}" oninput="authKeep()"></label>
+
+      <label class="fld">${ico('lock',14)}
+        <input id="au_pass" type="password" autocomplete="current-password"
+          placeholder="${t('password')}" value="${esc(f.pass||'')}"
+          oninput="authKeep()" onkeydown="if(event.key==='Enter')authSubmit()"></label>
+
+      ${S.authMsg? `<div class="autherr">${ico('alert',13)} ${esc(S.authMsg)}</div>`:''}
+
+      <button class="btn primary" onclick="authSubmit()">
+        ${ico(reg?'plus':'logout',15)} ${reg? t('createAccount') : t('enter')}</button>
+    </div>
+
+    <div class="authquick">
+      <div class="authquick-h">${ico('users',13)} ${t('quickAccess')}</div>
+      <div class="qgrid">
+        ${USERS.map(u=>`<button class="qacc" onclick="doLogin('${u.email}','${SEED_PASSWORD}')">
+          <span class="qav" style="background:${u.color}">${u.avatar}</span>
+          <b>${u.name}</b></button>`).join('')}
+      </div>
+      <div class="note" style="margin-top:10px">${ico('info',13)}<span>
+        ${EN()?'Team password':'Contraseña del equipo'}: <b>${SEED_PASSWORD}</b> · ${t('localNote')}</span></div>
+    </div>
+
+    <div class="authfoot">
+      <button onclick="toggleLang()">${ico('globe',13)} ${S.lang==='es'?'English':'Español'}</button>
+      <button onclick="toggleTheme()">${S.theme==='dark'?ico('moon',13):ico('sun',13)} ${t('theme')}</button>
+    </div>
+  </div>`;
+}
+function authKeep(){
+  S.authForm = {
+    name:(document.getElementById('au_name')||{}).value || '',
+    email:(document.getElementById('au_mail')||{}).value || '',
+    pass:(document.getElementById('au_pass')||{}).value || ''
+  };
+}
+function authSubmit(){
+  authKeep();
+  const f = S.authForm;
+  if(S.authMode==='up') doRegister(f.name, f.email, f.pass);
+  else doLogin(f.email, f.pass);
 }
 
 /* ---------- Cabecera ---------- */
@@ -210,8 +448,9 @@ function renderHeader(){
         </div>
       </div>
       <div class="avrow">
-        ${USERS.map(x=>`<button class="av ${x.id===S.user?'on':''}" style="background:${x.color}"
-            onclick="switchUser('${x.id}')" title="${esc(x.fullName)}">${x.avatar}${x.id===S.user?'<i class="dot"></i>':''}</button>`).join('')}
+        ${Object.values(S.accounts).slice(0,4).map(x=>`<button class="av ${x.email===S.user?'on':''}"
+            style="background:${x.color}" onclick="switchUser('${x.email}')" title="${esc(x.fullName||x.name)}">
+            ${x.avatar}${x.email===S.user?'<i class="dot"></i>':''}</button>`).join('')}
       </div>
     </div>
     <div class="userbar">
@@ -225,9 +464,6 @@ function renderHeader(){
       </div>
     </div>`;
 }
-function switchUser(id){ S.user = id; save(); render(); toast((EN()?'Profile: ':'Perfil: ')+USERS.find(u=>u.id===id).name,'good'); }
-function toggleLang(){ S.lang = S.lang==='es'?'en':'es'; save(); render(); }
-function toggleTheme(){ S.theme = S.theme==='dark'?'light':'dark'; save(); render(); }
 
 /* ---------- Navegación ---------- */
 const TABS = [
@@ -266,7 +502,7 @@ function screenHome(){
   const tools = [
     {v:'coupons', ic:'ticket', k:'coupons', c:'var(--amber)'},
     {v:'assistant', ic:'chat', k:'assistant', c:'var(--crimson-l)'},
-    {v:'plan', ic:'list', k:'myPlan', c:'var(--green)'},
+    {v:'tour', ic:'flag', k:'tour', c:'var(--green)'},
     {v:'lodging', ic:'bed', k:'lodging', c:'var(--blue)'},
     {v:'events', ic:'cal', k:'events', c:'var(--purple)'},
     {v:'border', ic:'globe', k:'border', c:'var(--amber)'},
@@ -297,12 +533,12 @@ function screenHome(){
     </div>` : ''}
 
     <div>
-      <div class="sec-h"><h2>${ico('layers',15)} ${t('directory')}</h2><span class="cnt">39 ${t('sites')}</span></div>
+      <div class="sec-h"><h2>${ico('layers',15)} ${t('directory')}</h2><span class="cnt">${PLACES.length} ${t('sites')}</span></div>
       <div class="catgrid">
         ${CATEGORIES.map((c,i)=>`
           <button class="cat ${i===0?'wide':''}" style="--c:${c.color}" onclick="S.cat='${c.id}';S.food='all';go('explore')">
             <div class="ci">${ico(c.icon,19)}</div>
-            <span class="cc">${c.count}</span>
+            <span class="cc">${PLACES.filter(x=>x.cat===c.id).length}</span>
             <div class="cn">${catName(c)}</div>
           </button>`).join('')}
       </div>
@@ -421,7 +657,7 @@ function shareText(txt){
 /* ---------- EXPLORAR ---------- */
 function screenExplore(){
   const list = filtered();
-  const active = S.cat!=='all' || S.bus!=='all' || S.q || S.food!=='all';
+  const active = S.cat!=='all' || S.bus!=='all' || S.q || S.food!=='all' || S.zone!=='all';
   return `<div class="pad stack">
     <div class="searchwrap">
       ${ico('search',17)}
@@ -437,6 +673,11 @@ function screenExplore(){
       <button class="pill ${S.food==='all'?'on':''}" onclick="S.food='all';render()">${t('food')}: ${t('allCats')}</button>
       ${FOOD_TYPES.map(f=>`<button class="pill ${S.food===f?'on':''}" onclick="S.food='${f}';render()">${f}</button>`).join('')}
     </div>`:''}
+    <div class="scroller">
+      <button class="pill ${S.zone==='all'?'on':''}" onclick="S.zone='all';render()">${t('allZones')}</button>
+      ${ZONES.map(z=>`<button class="pill ${S.zone===z.id?'on':''}" onclick="S.zone='${z.id}';render()">
+        ${EN()?z.shortEn:z.short} · ${PLACES.filter(p=>p.zone===z.id).length}</button>`).join('')}
+    </div>
     <div class="selrow">
       <label>${ico('bus',14)} ${t('line')}</label>
       <select onchange="S.bus=this.value;refreshList()">
@@ -447,7 +688,7 @@ function screenExplore(){
     <div class="between" style="font-size:11.5px;color:var(--tx2);padding:0 2px">
       <span id="cnt">${t('showing')} <b>${list.length}</b> ${t('found')}</span>
       ${active?`<button class="link" style="color:var(--crimson-l);font-weight:800;font-size:11.5px"
-        onclick="S.q='';S.cat='all';S.food='all';S.bus='all';render()">${ico('refresh',12)} ${t('clear')}</button>`:''}
+        onclick="S.q='';S.cat='all';S.food='all';S.bus='all';S.zone='all';render()">${ico('refresh',12)} ${t('clear')}</button>`:''}
     </div>
     <div class="stack" id="plist">${list.length? list.map(placeCard).join('') : emptyBox(t('noResults'))}</div>
   </div>`;
@@ -479,6 +720,10 @@ function placeCard(p){
       </div>
     </div>
     <div class="pbody">
+      <div class="zoneline">
+        <span class="zb" style="--zc:${zoneOf(p.zone).color}">${ico(p.zone==='ciudad'?'foot':'bus',10)} ${EN()?zoneOf(p.zone).shortEn:zoneOf(p.zone).short}</span>
+        <span>${p.travel ? esc(p.travel) : t('inCity')}</span>
+      </div>
       <p class="desc">${esc(p.history)}</p>
       <div class="prow">
         <span class="addr">${ico('pin',12)}<span>${esc(p.address)}</span></span>
@@ -494,18 +739,30 @@ function placeCard(p){
 }
 
 /* ---------- MAPA ---------- */
+function activeRoute(){
+  if(!S.routeOnMap) return null;
+  if(S.routeOnMap === 'custom'){
+    const stops = me().plan.filter(id=>place(id));
+    if(!stops.length) return null;
+    return { id:'custom', title:t('tour'), titleEn:t('tour'), color:'#E09B1E', stops, custom:true };
+  }
+  return ROUTES.find(x=>x.id===S.routeOnMap) || null;
+}
 function screenMap(){
-  const r = S.routeOnMap ? ROUTES.find(x=>x.id===S.routeOnMap) : null;
+  const r = activeRoute();
   return `<div id="mapview">
     <div id="mapbar">
       <div class="between" style="margin-bottom:8px">
         <span style="font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
           color:var(--tx2);display:flex;align-items:center;gap:6px">${ico('map',15)} ${EN()?'Tacna map':'Mapa de Tacna'}</span>
-        ${r?`<button class="btn sm ghost" onclick="S.routeOnMap=null;render()">${ico('x',12)} ${EN()?'Clear route':'Quitar ruta'}</button>`:''}
+        <div class="row" style="gap:6px">
+          <button class="btn sm ghost" onclick="locate()" title="${t('useLocation')}">${ico('target',13)}</button>
+          ${r?`<button class="btn sm ghost" onclick="S.routeOnMap=null;render()">${ico('x',12)} ${EN()?'Clear':'Quitar'}</button>`:''}
+        </div>
       </div>
       ${r? `<div style="background:color-mix(in srgb,${r.color} 16%,transparent);border:1px solid ${r.color}66;
         border-radius:11px;padding:9px 11px;font-size:11.5px;font-weight:700">
-        ${ico('nav',13)} ${EN()?r.titleEn:r.title} · ${r.stops.length} ${EN()?'stops':'paradas'}</div>`
+        ${ico(r.custom?'flag':'nav',13)} ${EN()?r.titleEn:r.title} · ${r.stops.length} ${EN()?'stops':'paradas'}</div>`
       : `<div class="scroller">
           <button class="pill ${S.cat==='all'?'on':''}" onclick="S.cat='all';render()">${t('allCats')}</button>
           ${CATEGORIES.map(c=>`<button class="pill ${S.cat===c.id?'on':''}" onclick="S.cat='${c.id}';render()">${catName(c)}</button>`).join('')}
@@ -535,14 +792,20 @@ function initMap(){
     maxZoom:19, attribution:'&copy; OpenStreetMap'
   }).addTo(map);
 
-  const r = S.routeOnMap ? ROUTES.find(x=>x.id===S.routeOnMap) : null;
+  const r = activeRoute();
   let list = r ? r.stops.map(place) : (S.cat==='all'? PLACES : PLACES.filter(p=>p.cat===S.cat));
+
+  const tour = me().tour;
+  const curId = (r && r.custom && tour && tour.active) ? r.stops[tour.idx] : null;
 
   const pts = [];
   list.forEach((p,i)=>{
-    const col = catOf(p.cat).color;
+    const col = r ? r.color : catOf(p.cat).color;
+    const isCur = p.id === curId;
+    const done = r && r.custom && tour && tour.active && i < tour.idx;
     const icon = L.divIcon({ className:'', iconSize:[26,26], iconAnchor:[13,26],
-      html:`<div class="pin" style="background:${col}"><b>${r? (i+1) : ''}</b></div>` });
+      html:`<div class="pin ${isCur?'pulse':''}" style="background:${done? '#0E8F6B' : col}${isCur?';transform:rotate(-45deg) scale(1.25)':''}">
+              <b>${r? (done? '✓' : i+1) : ''}</b></div>` });
     const m = L.marker([p.lat,p.lng],{icon}).addTo(map);
     pts.push([p.lat,p.lng]);
     m.bindPopup(`<div style="min-width:170px">
@@ -554,10 +817,18 @@ function initMap(){
         ${EN()?'View details':'Ver ficha'}</button></div>`);
   });
 
+  // marcador de la posición del usuario
+  if(S.geo){
+    L.marker([S.geo.lat, S.geo.lng], { icon: L.divIcon({ className:'', iconSize:[18,18], iconAnchor:[9,9],
+      html:'<div class="mepin"></div>' }) }).addTo(map).bindPopup(EN()?'You are here':'Estás aquí');
+    pts.push([S.geo.lat, S.geo.lng]);
+  }
+
   let bounds = null;
   if(r && pts.length>1){
-    const line = L.polyline(pts,{color:r.color, weight:4, opacity:.85, dashArray:'9,7'}).addTo(map);
-    bounds = line.getBounds();
+    const stopPts = r.stops.map(place).filter(Boolean).map(x=>[x.lat,x.lng]);
+    const line = L.polyline(stopPts,{color:r.color, weight:4, opacity:.85, dashArray:'9,7'}).addTo(map);
+    bounds = L.latLngBounds(pts);
   } else if(pts.length){
     bounds = L.latLngBounds(pts);
   }
@@ -575,8 +846,9 @@ function screenProfile(){
   const u = meUser(), p = me();
   const lv = levelOf(p.points), nx = nextLevel(p.points);
   const pct = nx ? Math.min(100, ((p.points - lv.min)/(nx.min - lv.min))*100) : 100;
+  const seedId = (USERS.find(x=>x.email===S.user)||{}).id;
   const myRevs = (p.reviews||[]).map(r=>({...r,userId:S.user}))
-    .concat(SEED_REVIEWS.filter(r=>r.userId===S.user));
+    .concat(SEED_REVIEWS.filter(r=>r.userId===seedId));
   return `<div class="pad stack">
     <div class="profcard">
       <div class="row">
@@ -584,13 +856,14 @@ function screenProfile(){
         <div class="grow">
           <div style="font-size:16px;font-weight:900;line-height:1.15">${esc(u.fullName)}</div>
           <div style="font-size:11.5px;color:var(--tx2);font-weight:600;margin-top:2px">${EN()?u.roleEn:u.role}</div>
+          <div style="font-size:10.5px;color:var(--tx3);margin-top:1px">${esc(u.email||'')}</div>
           <span class="lvlbadge" style="background:${lv.color};margin-top:6px;display:inline-block">
             ${lv.icon} ${lvlName(lv)}</span>
         </div>
       </div>
       <div class="statgrid">
         <div class="stat"><b>${p.points}</b><span>${t('points')}</span></div>
-        <div class="stat"><b>${p.stamps.length}/39</b><span>${t('stamps')}</span></div>
+        <div class="stat"><b>${p.stamps.length}/${PLACES.length}</b><span>${t('stamps')}</span></div>
         <div class="stat"><b>${(p.coupons||[]).length}</b><span>${EN()?'coupons':'cupones'}</span></div>
       </div>
       <div style="margin-top:12px">
@@ -603,24 +876,25 @@ function screenProfile(){
     </div>
 
     <div class="card p">
-      <div class="sec-h" style="margin-bottom:9px"><h2>${ico('users',14)} ${t('switchProfile')}</h2></div>
+      <div class="sec-h" style="margin-bottom:9px"><h2>${ico('users',14)} ${t('accounts')}</h2></div>
       <div class="catgrid">
-        ${USERS.map(x=>{
-          const px = S.profiles[x.id];
-          return `<button class="cat" style="--c:${x.color};${x.id===S.user?'border-color:'+x.color:''}"
-            onclick="switchUser('${x.id}')">
+        ${Object.values(S.accounts).map(x=>{
+          const px = S.profiles[x.email] || defaultProfile();
+          return `<button class="cat" style="--c:${x.color};${x.email===S.user?'border-color:'+x.color:''}"
+            onclick="switchUser('${x.email}')">
             <div class="ci" style="width:32px;height:32px;font-size:11px;font-weight:900">${x.avatar}</div>
-            <div class="cn">${x.name}</div>
+            <div class="cn">${esc(x.name)}</div>
             <div style="position:relative;z-index:1;font-size:10px;color:var(--tx3);font-weight:700;margin-top:2px">
               ${px.stamps.length} ${t('stamps')} · ${px.points} pts</div>
           </button>`;
         }).join('')}
       </div>
+      <div class="note" style="margin-top:10px">${ico('info',13)}<span>${t('localNote')}</span></div>
     </div>
 
     <div>
       <div class="sec-h"><h2>${ico('award',14)} ${t('passport')}</h2>
-        <span class="cnt">${p.stamps.length} / 39</span></div>
+        <span class="cnt">${p.stamps.length} / ${PLACES.length}</span></div>
       <div class="stampgrid">
         ${PLACES.map(pl=>{
           const on = p.stamps.includes(pl.id);
@@ -645,7 +919,10 @@ function screenProfile(){
       </div>
     </div>
 
-    <button class="btn ghost" onclick="openView('credits')">${ico('info',15)} ${t('credits')}</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn ghost" onclick="openView('credits')">${ico('info',15)} ${t('credits')}</button>
+      <button class="btn ghost" onclick="doLogout()">${ico('logout',15)} ${t('signOut')}</button>
+    </div>
   </div>`;
 }
 function starsHtml(n){
@@ -700,6 +977,10 @@ function renderModal(){
 
         <div class="block">
           <h4 style="color:var(--blue)">${ico('bus',13)} ${t('buses')}</h4>
+          <div class="zoneline" style="margin:0 0 9px">
+            <span class="zb" style="--zc:${zoneOf(p.zone).color}">${ico(p.zone==='ciudad'?'foot':'bus',10)} ${EN()?zoneOf(p.zone).nameEn:zoneOf(p.zone).name}</span>
+            <span>${t('travelTime')}: ${p.travel ? esc(p.travel) : t('inCity')}</span>
+          </div>
           <div class="buses" style="margin:0">
             ${p.bus.map(b=>`<span class="bus" style="font-size:11px;padding:5px 9px">${esc(b)}</span>`).join('')}
           </div>
@@ -753,7 +1034,7 @@ function setStar(i){
   });
 }
 function revHtml(r){
-  const u = USERS.find(x=>x.id===r.userId) || {name:'Visitante',avatar:'V',color:'#64748B',role:''};
+  const u = who(r.userId);
   return `<div class="rev">
     <div class="rh">
       <div class="ra">
@@ -805,7 +1086,7 @@ function togglePlan(id){
   else { p.plan.push(id); toast(EN()?'Added to your plan':'Agregado a tu plan','good'); }
   save();
   if(S.detail) renderModal();
-  if(S.view==='plan') render();
+  if(S.view==='tour') render();
 }
 function sharePlace(id){
   const p = place(id);
@@ -851,7 +1132,7 @@ function viewScreen(){
   switch(S.view){
     case 'fx': return back(t('converter')) + `<div class="pad stack">${fxWidget(true)}</div>`;
     case 'coupons': return back(t('coupons')) + viewCoupons();
-    case 'plan': return back(t('myPlan')) + viewPlan();
+    case 'tour': return back(t('tour')) + viewTour();
     case 'lodging': return back(t('lodging')) + viewLodging();
     case 'events': return back(t('events')) + viewEvents();
     case 'border': return back(t('border')) + viewBorder();
@@ -993,43 +1274,235 @@ function redeem(id){
   toast((EN()?'Coupon redeemed: ':'Cupón canjeado: ')+code, 'good');
 }
 
-/* ---------- MI PLAN ---------- */
-function viewPlan(){
-  const ids = me().plan;
-  const list = ids.map(place).filter(Boolean);
-  const total = list.reduce((a,p)=>a+(p.soles||0),0);
+/* ---------- MI RECORRIDO ---------- */
+function viewTour(){
+  const p = me();
+  const list = p.plan.map(place).filter(Boolean);
+  if(!list.length){
+    return `<div class="pad stack">
+      <div class="empty"><div class="eico">🧭</div>${t('tourEmpty')}</div>
+      <button class="btn primary" onclick="closeView();go('explore')">${ico('search',15)} ${t('addPlaces')}</button>
+    </div>`;
+  }
+  const total = list.reduce((a,x)=>a+(x.soles||0),0);
+  const walk = routeLength(list);
+  const active = p.tour && p.tour.active;
+
   return `<div class="pad stack">
-    ${list.length? `
-      <div class="card p between">
-        <div><div style="font-size:10.5px;color:var(--tx3);font-weight:800;text-transform:uppercase">${t('planTotal')}</div>
-          <div style="font-size:24px;font-weight:900;color:var(--amber)">S/ ${total}</div></div>
+    ${active ? tourCard() : ''}
+
+    <div class="card p">
+      <div class="between">
+        <div>
+          <div class="kpi-k">${t('stopsChosen')}</div>
+          <div class="kpi-v">${list.length}</div>
+        </div>
+        <div style="text-align:center">
+          <div class="kpi-k">${t('distance')}</div>
+          <div class="kpi-v" style="color:var(--blue)">${walk < 1000 ? Math.round(walk)+' m' : (walk/1000).toFixed(1)+' km'}</div>
+        </div>
         <div style="text-align:right">
-          <div style="font-size:10.5px;color:var(--tx3);font-weight:800;text-transform:uppercase">${EN()?'Places':'Lugares'}</div>
-          <div style="font-size:24px;font-weight:900">${list.length}</div></div>
+          <div class="kpi-k">${t('planTotal')}</div>
+          <div class="kpi-v" style="color:var(--amber)">S/ ${total}</div>
+        </div>
       </div>
-      <div class="stack">
-        ${list.map((p,i)=>`<div class="stop">
-          <div class="row grow" style="min-width:0">
-            <span class="stopn">${i+1}</span>
-            <div class="si grow" onclick="openPlace('${p.id}')" style="cursor:pointer">
-              <b>${esc(p.name)}</b>
-              <span>${ico('bus',9)} ${p.bus.slice(0,3).join(' · ')} · ${pPrice(p)}</span>
-            </div>
-          </div>
-          <button class="minibtn" onclick="togglePlan('${p.id}')">${ico('trash',11)}</button>
-        </div>`).join('')}
-      </div>
-      <button class="btn primary" onclick="sharePlan()">${ico('share',15)} ${t('shareWhatsapp')}</button>
-    ` : `<div class="empty"><div class="eico">🧳</div>${t('planEmpty')}</div>
-         <button class="btn ghost" onclick="go('explore')">${ico('search',15)} ${t('explore')}</button>`}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn ghost" onclick="optimizePlan()">${ico('target',14)} ${t('optimize')}</button>
+      <button class="btn ghost" onclick="showCustomOnMap()">${ico('map',14)} ${t('myRoute')}</button>
+    </div>
+
+    ${!active ? `<button class="btn primary" onclick="startTour()">
+        ${ico('play',15)} ${t('tourStart')} (${list.length} ${t('stops').toLowerCase()})</button>`
+      : `<button class="btn ghost" onclick="endTour()">${ico('x',14)} ${t('tourFinish')}</button>`}
+
+    ${S.geoState!=='ok' ? `<button class="btn ghost" onclick="locate()">
+        ${ico('target',14)} ${S.geoState==='wait'? t('locating') : t('useLocation')}</button>` : ''}
+
+    <div class="stack">
+      ${list.map((x,i)=>tourStopRow(x,i,list.length)).join('')}
+    </div>
+
+    <button class="btn ghost" onclick="closeView();go('explore')">${ico('plus',14)} ${t('addPlaces')}</button>
+    <button class="btn ghost" onclick="shareTour()">${ico('share',14)} ${t('shareWhatsapp')}</button>
   </div>`;
 }
-function sharePlan(){
+
+function tourStopRow(x, i, n){
+  const p = me();
+  const active = p.tour && p.tour.active;
+  const cur = active && p.tour.idx === i;
+  const past = active && i < p.tour.idx;
+  const d = S.geo ? haversine(S.geo, x) : null;
+  return `<div class="stop ${cur?'cur':''} ${past?'past':''}">
+    <div class="row grow" style="min-width:0">
+      <span class="stopn ${cur?'on':''} ${past?'ok':''}">${past? '✓' : i+1}</span>
+      <div class="si grow" onclick="openPlace('${x.id}')" style="cursor:pointer">
+        <b>${esc(x.name)}</b>
+        <span>${ico('bus',9)} ${x.bus.slice(0,3).join(' · ')} · ${pPrice(x)}${d!==null? ' · '+fmtDist(d):''}</span>
+      </div>
+    </div>
+    <div class="ordbtns">
+      <button class="minibtn" onclick="movePlan(${i},-1)" ${i===0?'disabled':''}>${ico('up',12)}</button>
+      <button class="minibtn" onclick="movePlan(${i},1)" ${i===n-1?'disabled':''}>${ico('down',12)}</button>
+      <button class="minibtn" onclick="togglePlan('${x.id}')">${ico('trash',11)}</button>
+    </div>
+  </div>`;
+}
+
+/* Tarjeta grande del destino actual mientras el recorrido está activo */
+function tourCard(){
+  const p = me();
+  const list = p.plan.map(place).filter(Boolean);
+  const i = p.tour.idx;
+  if(i >= list.length) return '';
+  const x = list[i];
+  const d = S.geo ? haversine(S.geo, x) : null;
+  const open = isOpen(x);
+  return `<div class="tourcard">
+    <div class="between">
+      <span class="tourtag">${ico('flag',12)} ${t('tourStop')} ${i+1} ${t('tourOf')} ${list.length}</span>
+      <span class="chip ${open?'ok':'no'}" style="position:static">${open? '● '+t('openToday') : t('closedToday')}</span>
+    </div>
+    <h3>${esc(x.name)}</h3>
+    <p class="tcsub">${esc(pSub(x))} · ${esc(x.address)}</p>
+    <div class="tcrow">
+      <span>${ico('clock',12)} ${esc(pSched(x))}</span>
+      <span>${ico('bus',12)} ${x.bus.slice(0,3).join(', ')}</span>
+    </div>
+    ${d!==null
+      ? `<div class="tcdist">${ico('target',14)} ${fmtDist(d)} ${t('away')}</div>`
+      : `<button class="btn sm ghost" style="width:100%;margin-top:9px" onclick="locate()">
+           ${ico('target',13)} ${S.geoState==='wait'? t('locating') : t('useLocation')}</button>`}
+    <div class="tcdots">
+      ${list.map((_,k)=>`<i class="${k<i?'done':k===i?'now':''}"></i>`).join('')}
+    </div>
+    <button class="btn amber" style="margin-top:11px" onclick="tourArrive()">
+      ${ico('checkc',16)} ${t('tourArrived')} (+${POINTS.visit} pts)</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <button class="btn ghost" onclick="mapsTo(${x.lat},${x.lng},'${esc(x.name)}')">${ico('nav',14)} ${t('howToGet')}</button>
+      <button class="btn ghost" onclick="tourSkip()">${ico('chevron',14)} ${t('tourSkip')}</button>
+    </div>
+  </div>`;
+}
+
+/* Barra flotante que recuerda el recorrido en curso desde cualquier pestaña */
+function renderTourBar(){
+  const el = document.getElementById('tourbar');
+  if(!el) return;
+  const p = me();
+  const list = p.plan.map(place).filter(Boolean);
+  const on = p.tour && p.tour.active && p.tour.idx < list.length && S.view !== 'tour';
+  const app = document.getElementById('app');
+  if(!on){ el.innerHTML = ''; el.classList.remove('show'); if(app) app.classList.remove('tourOn'); return; }
+  if(app) app.classList.add('tourOn');
+  const x = list[p.tour.idx];
+  const d = S.geo ? haversine(S.geo, x) : null;
+  el.classList.add('show');
+  el.innerHTML = `<button class="tbar" onclick="openView('tour')">
+    <span class="tbn">${p.tour.idx+1}/${list.length}</span>
+    <span class="grow" style="text-align:left;min-width:0">
+      <b>${t('tourNext')}</b>
+      <span>${esc(x.name)}${d!==null? ' · '+fmtDist(d):''}</span>
+    </span>
+    ${ico('chevron',16)}
+  </button>`;
+}
+
+/* ---------- Acciones del recorrido ---------- */
+function movePlan(i, dir){
+  const p = me(), j = i + dir;
+  if(j < 0 || j >= p.plan.length) return;
+  const tmp = p.plan[i]; p.plan[i] = p.plan[j]; p.plan[j] = tmp;
+  save(); render();
+}
+
+function routeLength(list){
+  let m = 0;
+  for(let i=1;i<list.length;i++) m += haversine(list[i-1], list[i]);
+  return m;
+}
+
+/* Ordena las paradas por cercanía empezando en la primera que el usuario eligió */
+function optimizePlan(){
+  const p = me();
+  const pts = p.plan.map(place).filter(Boolean);
+  if(pts.length < 3){ toast(EN()?'Add at least three stops':'Agrega al menos tres paradas'); return; }
+  const before = routeLength(pts);
+  const rest = pts.slice();
+  const order = [ S.geo ? rest.splice(nearestIdx(S.geo, rest),1)[0] : rest.shift() ];
+  while(rest.length){
+    const k = nearestIdx(order[order.length-1], rest);
+    order.push(rest.splice(k,1)[0]);
+  }
+  p.plan = order.map(x=>x.id);
+  const after = routeLength(order);
+  save(); render();
+  const saved = Math.max(0, before - after);
+  toast(EN()
+    ? `Reordered${saved>50? ' · '+fmtDist(saved)+' shorter':''}`
+    : `Reordenado${saved>50? ' · '+fmtDist(saved)+' menos':''}`, 'good');
+}
+function nearestIdx(from, arr){
+  let best = 0, bd = Infinity;
+  arr.forEach((x,i)=>{ const d = haversine(from, x); if(d < bd){ bd = d; best = i; } });
+  return best;
+}
+
+function startTour(){
+  const p = me();
+  if(!p.plan.length) return;
+  p.tour = { active:true, idx:0 };
+  save(); render();
+  toast(EN()?'Trail started. Head to stop 1.':'Recorrido iniciado. Ve a la parada 1.', 'good');
+}
+
+function tourArrive(){
+  const p = me();
+  const list = p.plan.map(place).filter(Boolean);
+  const x = list[p.tour.idx];
+  if(!x) return;
+  if(!p.stamps.includes(x.id)) toggleStamp(x.id, null, false);
+  advanceTour();
+}
+function tourSkip(){ advanceTour(); }
+
+function advanceTour(){
+  const p = me();
+  const list = p.plan.map(place).filter(Boolean);
+  p.tour.idx++;
+  if(p.tour.idx >= list.length){
+    p.tour.active = false;
+    p.tour.idx = 0;
+    p.points += POINTS.route;
+    save(); render();
+    toast(`🏁 ${t('tourDone')} +${POINTS.route} ${t('points')}`, 'pts');
+    return;
+  }
+  save(); render();
+  const next = list[p.tour.idx];
+  toast(`${t('tourNext')}: ${next.name}`, 'good');
+}
+
+function endTour(){
+  const p = me();
+  p.tour = { active:false, idx:0 };
+  save(); render();
+}
+
+function showCustomOnMap(){
+  S.routeOnMap = 'custom';
+  closeView(); go('map');
+}
+
+function shareTour(){
   const list = me().plan.map(place).filter(Boolean);
-  const total = list.reduce((a,p)=>a+(p.soles||0),0);
-  shareText(`🧳 ${EN()?'My Tacna plan':'Mi plan en Tacna'} — TacnaGo\n\n`+
-    list.map((p,i)=>`${i+1}. ${p.name}\n   🚍 ${p.bus.slice(0,2).join(', ')} · 💰 ${p.price}`).join('\n')+
-    `\n\n${EN()?'Estimated':'Estimado'}: S/ ${total}\n\n${EN()?'Made with TacnaGo 2026':'Hecho con TacnaGo 2026'}`);
+  const total = list.reduce((a,x)=>a+(x.soles||0),0);
+  const km = (routeLength(list)/1000).toFixed(1);
+  shareText(`🧭 ${EN()?'My trail in Tacna':'Mi recorrido por Tacna'} — TacnaGo\n\n`+
+    list.map((x,i)=>`${i+1}. ${x.name}\n   🚍 ${x.bus.slice(0,2).join(', ')} · 💰 ${x.price}`).join('\n')+
+    `\n\n📏 ${km} km · 💰 ${EN()?'approx.':'aprox.'} S/ ${total}\n\n${EN()?'Made with TacnaGo 2026':'Hecho con TacnaGo 2026'}`);
 }
 
 /* ---------- HOSPEDAJE ---------- */
@@ -1327,8 +1800,8 @@ function viewCredits(){
     </div>
     <div class="card p" style="font-size:11.5px;color:var(--tx2);line-height:1.7">
       <b style="color:var(--tx);display:block;margin-bottom:5px">${EN()?'Technology':'Tecnología'}</b>
-      ${EN()?'Progressive Web App (installable), OpenStreetMap + Leaflet, local storage on the device, offline mode with service worker.'
-            :'Aplicación web progresiva (instalable), OpenStreetMap + Leaflet, almacenamiento local en el dispositivo, modo sin conexión con service worker.'}
+      ${EN()?'Progressive Web App (installable), OpenStreetMap + Leaflet, geolocation, local storage on the device, offline mode with service worker. Accounts are stored on the device itself; a server such as Firebase Authentication would be the next step for accounts shared across phones.'
+            :'Aplicación web progresiva (instalable), OpenStreetMap + Leaflet, geolocalización, almacenamiento local en el dispositivo y modo sin conexión con service worker. Las cuentas se guardan en el propio dispositivo; un servidor como Firebase Authentication sería el siguiente paso para que la misma cuenta funcione en varios celulares.'}
     </div>
     <div class="note">${ico('alert',14)}<span>${EN()
       ?'Prototype for academic purposes. Addresses, hours, bus lines and prices were compiled by the team and must be verified before public release.'
@@ -1347,6 +1820,7 @@ function resetAll(){
    INICIO DE LA APLICACIÓN
    ========================================================================== */
 function dailyStreak(){
+  if(!S.user) return;
   const d = new Date().toISOString().slice(0,10);
   const p = me();
   if(p.lastDay !== d){
@@ -1396,7 +1870,7 @@ function boot(){
         onclick="dismissInstall()">${t('later')}</button>
     </div>`;
   render();
-  dailyStreak();
+  if(S.user) dailyStreak();
   netState();
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(()=>{});

@@ -20,16 +20,23 @@ const USERS = [
     avatar:'EI', color:'#0E8F6B', badge:'Investigadora de Campo', badgeEn:'Field Researcher' }
 ];
 
+/* Contraseña inicial de las 4 cuentas del equipo. Cámbienla desde el perfil. */
+const SEED_PASSWORD = 'tacna2026';
+USERS.forEach(u => { u.email = u.name.toLowerCase() + '@tacnago.pe'; });
+
 /* ---------- 2. CATEGORÍAS ---------- */
 const CATEGORIES = [
-  { id:'atractivos', name:'Atractivos Turísticos e Historia', nameEn:'Attractions & History', icon:'landmark', color:'#C2182B', count:10 },
-  { id:'cafeterias', name:'Cafeterías', nameEn:'Coffee Shops', icon:'coffee', color:'#C47F17', count:7 },
-  { id:'restaurantes', name:'Restaurantes', nameEn:'Restaurants', icon:'utensils', color:'#D4452A', count:8 },
-  { id:'comerciales', name:'Centros Comerciales', nameEn:'Shopping Centers', icon:'bag', color:'#1D6FD0', count:7 },
-  { id:'ferias', name:'Ferias y Cachinas', nameEn:'Fairs & Flea Markets', icon:'cart', color:'#8B3FD0', count:7 }
+  { id:'atractivos', name:'Atractivos Turísticos e Historia', nameEn:'Attractions & History', icon:'landmark', color:'#C2182B' },
+  { id:'cafeterias', name:'Cafeterías', nameEn:'Coffee Shops', icon:'coffee', color:'#C47F17' },
+  { id:'restaurantes', name:'Restaurantes', nameEn:'Restaurants', icon:'utensils', color:'#D4452A' },
+  { id:'comerciales', name:'Centros Comerciales', nameEn:'Shopping Centers', icon:'bag', color:'#1D6FD0' },
+  { id:'ferias', name:'Ferias y Cachinas', nameEn:'Fairs & Flea Markets', icon:'cart', color:'#8B3FD0' },
+  { id:'naturaleza', name:'Naturaleza y Aventura', nameEn:'Nature & Adventure', icon:'mountain', color:'#0E8F6B' },
+  { id:'provincias', name:'Provincias y Pueblos', nameEn:'Provinces & Towns', icon:'village', color:'#9A5B2E' },
+  { id:'servicios', name:'Llegada y Servicios', nameEn:'Arrival & Services', icon:'bus', color:'#50607A' }
 ];
 
-/* ---------- 3. LOS 39 SITIOS DE TACNA ---------- */
+/* ---------- 3. LOS SITIOS DE TACNA ---------- */
 /* openDays: 0=Domingo 1=Lunes 2=Martes 3=Miércoles 4=Jueves 5=Viernes 6=Sábado */
 const PLACES = [
   /* === ATRACTIVOS TURÍSTICOS E HISTORIA (10) === */
@@ -235,7 +242,117 @@ const PLACES = [
     address:'Paseo Cívico de Tacna', lat:-18.0140, lng:-70.2505,
     schedule:'Jue a Dom: 9:00 am - 8:00 pm', scheduleEn:'Thu to Sun: 9:00 am - 8:00 pm', openDays:[0,4,5,6],
     history:'Feria turística donde artesanos de las provincias de Tacna exhiben macerados de damasco, aceite de oliva, tejidos y tallados en piedra.',
-    bus:['2B','202','10B','15'], price:'S/ 10 - S/ 60', priceEn:'S/ 10 - S/ 60', soles:30, rating:4.9, tip:'El mejor lugar para llevar un recuerdo auténtico de Tacna.' }
+    bus:['2B','202','10B','15'], price:'S/ 10 - S/ 60', priceEn:'S/ 10 - S/ 60', soles:30, rating:4.9, tip:'El mejor lugar para llevar un recuerdo auténtico de Tacna.' },
+
+  /* === CENTRO HISTÓRICO (ampliación) === */
+  { id:'p40', name:'Centro Cultural Casa Basadre', cat:'atractivos', sub:'Casa Museo', subEn:'House Museum',
+    address:'Av. San Martín 212', lat:-18.0128, lng:-70.2512,
+    schedule:'Mar a Dom: 9:00 am - 1:00 pm y 2:00 pm - 6:00 pm', scheduleEn:'Tue to Sun: 9:00 am - 1:00 pm and 2:00 pm - 6:00 pm', openDays:[0,2,3,4,5,6],
+    history:'Casa donde vivió sus primeros años el historiador Jorge Basadre, autor de "Perú: problema y posibilidad". Hoy funciona como centro cultural con documentos de su familia y una galería fotográfica de la arquitectura de la casa.',
+    bus:['2B','202','10B','15'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.7,
+    tip:'Está en pleno centro: se combina a pie con la Catedral y la Casa Zela en una sola mañana.' },
+  { id:'p41', name:'Casa Jurídica', cat:'atractivos', sub:'Monumento Histórico', subEn:'Historic Monument',
+    address:'Centro histórico de Tacna', lat:-18.0133, lng:-70.2496,
+    schedule:'Lun a Vie: 9:00 am - 5:00 pm', scheduleEn:'Mon to Fri: 9:00 am - 5:00 pm', openDays:[1,2,3,4,5],
+    history:'Casona construida en 1903 por el arquitecto italiano Alberto Figini. Es el lugar donde se firmó el acta de entrega de Tacna al Perú el 28 de agosto de 1929. Exhibe fotografías y documentos del proceso de Reincorporación.',
+    bus:['2B','10B','15'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.7,
+    tip:'Aquí se firmó la Reincorporación. Imprescindible si vienes cerca del 28 de agosto.' },
+  { id:'p42', name:'Teatro Municipal de Tacna', cat:'atractivos', sub:'Patrimonio Arquitectónico', subEn:'Architectural Heritage',
+    address:'Pasaje Calderón de la Barca s/n, frente a la plaza MacLean', lat:-18.0120, lng:-70.2500,
+    schedule:'Visitas coordinadas con la municipalidad', scheduleEn:'Visits arranged with the municipality', openDays:[1,2,3,4,5],
+    history:'Teatro histórico de la ciudad que durante la Guerra del Pacífico sirvió como hospital de campaña. Mantiene su función cultural con funciones y actividades municipales.',
+    bus:['2B','202','10B'], price:'Según función', priceEn:'Varies by show', soles:0, rating:4.5,
+    tip:'No se entra sin coordinar antes. Llama a la municipalidad si quieren visitarlo en grupo.' },
+  { id:'p43', name:'Pileta Ornamental del Paseo Cívico', cat:'atractivos', sub:'Monumento', subEn:'Monument',
+    address:'Paseo Cívico de Tacna', lat:-18.0140, lng:-70.2507,
+    schedule:'Abierto 24 horas', scheduleEn:'Open 24 hours', openDays:[0,1,2,3,4,5,6],
+    history:'Fuente de hierro fundido instalada en 1869, uno de los elementos más antiguos del Paseo Cívico. Rinde homenaje a los héroes Miguel Grau y Francisco Bolognesi junto al Arco Parabólico.',
+    bus:['2B','202','10B','15'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.6,
+    tip:'De noche se ilumina. Es la mejor foto del centro después del Arco.' },
+  { id:'p44', name:'Alameda Bolognesi', cat:'atractivos', sub:'Paseo Urbano', subEn:'Urban Promenade',
+    address:'Av. Bolognesi, centro de Tacna', lat:-18.0155, lng:-70.2525,
+    schedule:'Abierto 24 horas', scheduleEn:'Open 24 hours', openDays:[0,1,2,3,4,5,6],
+    history:'Paseo arbolado tradicional del centro de Tacna, incluido en los circuitos turísticos de la ciudad. Punto de descanso y encuentro entre el Paseo Cívico y la zona comercial.',
+    bus:['2B','202','3B'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.4,
+    tip:'Buen atajo con sombra para caminar del Paseo Cívico hacia Bolognesi al mediodía.' },
+  { id:'p45', name:'Mercado Central de Tacna', cat:'ferias', sub:'Mercado de Abastos', subEn:'Central Market',
+    address:'Centro de Tacna', lat:-18.0110, lng:-70.2520,
+    schedule:'Lun a Dom: 6:00 am - 6:00 pm', scheduleEn:'Mon to Sun: 6:00 am - 6:00 pm', openDays:[0,1,2,3,4,5,6],
+    history:'En el primer piso se venden productos agrícolas de la región: aceitunas y derivados del olivo, orégano, ajíes y frutas frescas. En el segundo piso hay puestos de comida y jugos de fruta.',
+    bus:['2B','202','14','15'], price:'Económico', priceEn:'Budget', soles:15, rating:4.7,
+    tip:'Sube al segundo piso: los jugos y el menú del mercado son lo más barato del centro.' },
+
+  /* === NATURALEZA Y COSTA === */
+  { id:'p46', name:'Humedales de Ite', cat:'naturaleza', sub:'Observación de Aves', subEn:'Birdwatching',
+    address:'Desembocadura del río Locumba, distrito de Ite', lat:-17.8850, lng:-70.9550,
+    schedule:'Lun a Dom: 7:00 am - 5:00 pm', scheduleEn:'Mon to Sun: 7:00 am - 5:00 pm', openDays:[0,1,2,3,4,5,6],
+    history:'Considerado el segundo humedal más grande de Sudamérica. Alberga más de 126 especies de aves residentes y migratorias, que pueden observarse desde los miradores habilitados. Es un ecosistema costero recuperado tras años de actividad minera.',
+    bus:['Bus Ite','Combi Locumba'], price:'S/ 5.00', priceEn:'S/ 5.00', soles:5, rating:4.8,
+    tip:'Lleva binoculares y ve temprano: las aves se ven mucho mejor antes de las 9 am.' },
+  { id:'p47', name:'Balneario de Boca del Río', cat:'naturaleza', sub:'Playa', subEn:'Beach',
+    address:'Desembocadura del río Sama, distrito de Sama', lat:-18.1650, lng:-70.8700,
+    schedule:'Abierto todo el día', scheduleEn:'Open all day', openDays:[0,1,2,3,4,5,6],
+    history:'Principal balneario de Tacna, ubicado a unos 50 km al suroeste de la ciudad en la desembocadura del río Sama. Tiene playa amplia, restaurantes y mucho movimiento en temporada de verano.',
+    bus:['Bus Boca del Río','Colectivo Sama'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.6,
+    tip:'En verano se llena los fines de semana. Entre semana la tienes casi para ti.' },
+  { id:'p48', name:'Laguna de Aricota', cat:'naturaleza', sub:'Laguna Altoandina', subEn:'Highland Lake',
+    address:'Provincia de Candarave, 2 800 msnm', lat:-17.3500, lng:-70.2000,
+    schedule:'Abierto todo el día', scheduleEn:'Open all day', openDays:[0,1,2,3,4,5,6],
+    history:'La laguna más grande de la región Tacna, situada a 2 800 metros sobre el nivel del mar. Abundan las truchas y es hogar de cormoranes y la huallata andina. Alimenta las centrales hidroeléctricas Aricota 1 y 2.',
+    bus:['Bus Candarave','Tour agencia'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.7,
+    tip:'Ideal para trekking. Abrígate: aunque sea de día, el viento del altiplano es frío.' },
+  { id:'p52', name:'Cataratas de Conchachiri', cat:'naturaleza', sub:'Catarata', subEn:'Waterfall',
+    address:'Provincia de Tarata', lat:-17.4600, lng:-70.0500,
+    schedule:'Lun a Dom, horario de luz', scheduleEn:'Mon to Sun, daylight hours', openDays:[0,1,2,3,4,5,6],
+    history:'Salto de agua en la provincia andina de Tarata, incluido en los circuitos de naturaleza de la zona junto con los petroglifos y el camino inca.',
+    bus:['Bus Tarata','Tour agencia'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.5,
+    tip:'Dato por verificar en campo: confirmen el estado del camino antes de ir.' },
+  { id:'p53', name:'Valle de Sama', cat:'naturaleza', sub:'Valle Agrícola', subEn:'Agricultural Valley',
+    address:'Distrito de Sama, camino al litoral', lat:-17.9800, lng:-70.5200,
+    schedule:'Abierto todo el día', scheduleEn:'Open all day', openDays:[0,1,2,3,4,5,6],
+    history:'Valle agrícola camino a la costa tacneña, con paisajes de cultivo y caminatas cortas. Es el paso natural entre la ciudad y el balneario de Boca del Río.',
+    bus:['Bus Boca del Río','Colectivo Sama'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.4,
+    tip:'Parada natural si van a la playa: se puede comer camarón de río en la zona.' },
+
+  /* === PROVINCIAS Y PUEBLOS === */
+  { id:'p54', name:'Tarata y sus Andenerías', cat:'provincias', sub:'Pueblo Andino', subEn:'Andean Town',
+    address:'Provincia de Tarata, a unos 80 km de Tacna', lat:-17.4750, lng:-70.0330,
+    schedule:'Abierto todo el día', scheduleEn:'Open all day', openDays:[0,1,2,3,4,5,6],
+    history:'Pueblo andino a hora y veinte de Tacna subiendo por el Alto Intiorko. Sus andenes son terrazas agrícolas construidas desde épocas preincaicas, aún en uso para el cultivo de papa y maíz, y por la zona pasa un ramal del Qhapaq Ñan.',
+    bus:['Bus Tarata','Colectivo Tarata'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.8,
+    tip:'Desayuna allá: el pan amasado y los huevos de campo son parte de la experiencia.' },
+  { id:'p55', name:'Catedral de Tarata', cat:'provincias', sub:'Patrimonio Religioso', subEn:'Religious Heritage',
+    address:'Plaza principal de Tarata', lat:-17.4748, lng:-70.0335,
+    schedule:'Lun a Dom, horario de culto', scheduleEn:'Mon to Sun, service hours', openDays:[0,1,2,3,4,5,6],
+    history:'Templo principal del pueblo de Tarata, ubicado frente a su plaza y parte obligada del circuito turístico andino de la región.',
+    bus:['Bus Tarata','Colectivo Tarata'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.6,
+    tip:'Está en la plaza misma de Tarata, a un costado de donde para el colectivo.' },
+  { id:'p56', name:'Baños Termales de Ticaco', cat:'provincias', sub:'Termalismo', subEn:'Hot Springs',
+    address:'Distrito de Ticaco, provincia de Tarata', lat:-17.4167, lng:-70.0333,
+    schedule:'Lun a Dom: 7:00 am - 5:00 pm', scheduleEn:'Mon to Sun: 7:00 am - 5:00 pm', openDays:[0,1,2,3,4,5,6],
+    history:'Pozas termales de la provincia de Tarata, parada habitual de los tours andinos que salen de Tacna rumbo a Tarata y Candarave.',
+    bus:['Bus Tarata','Tour agencia'], price:'S/ 5.00 - S/ 10.00', priceEn:'S/ 5.00 - S/ 10.00', soles:8, rating:4.6,
+    tip:'Lleva toalla y sandalias: las pozas son rústicas, no hay alquiler.' },
+  { id:'p57', name:'Iglesia San Pedro de Ilabaya', cat:'provincias', sub:'Patrimonio Religioso', subEn:'Religious Heritage',
+    address:'Distrito de Ilabaya, provincia Jorge Basadre', lat:-17.4167, lng:-70.5167,
+    schedule:'Lun a Dom, horario de culto', scheduleEn:'Mon to Sun, service hours', openDays:[0,1,2,3,4,5,6],
+    history:'Iglesia histórica del distrito de Ilabaya, en la provincia Jorge Basadre, incluida entre los atractivos religiosos y patrimoniales de la región Tacna.',
+    bus:['Bus Ilabaya','Combi Locumba'], price:'Gratuito', priceEn:'Free', soles:0, rating:4.5,
+    tip:'Queda camino a Ite: se puede combinar con los humedales en un mismo día.' },
+
+  /* === LLEGADA Y SERVICIOS === */
+  { id:'p58', name:'Terminal Terrestre Internacional Manuel A. Odría', cat:'servicios', sub:'Terminal de Buses', subEn:'Bus Terminal',
+    address:'Carretera Panamericana Sur, Tacna', lat:-18.0000, lng:-70.2550,
+    schedule:'Abierto 24 horas', scheduleEn:'Open 24 hours', openDays:[0,1,2,3,4,5,6],
+    history:'Terminal desde donde salen los colectivos y buses hacia Arica, Chile. El servicio opera durante todo el día con salidas frecuentes y el viaje suele tomar alrededor de dos horas y veinte minutos incluyendo el control fronterizo.',
+    bus:['2B','202','14','200'], price:'Según destino', priceEn:'Depends on destination', soles:0, rating:4.3,
+    tip:'Punto de partida a Arica. Lleva tu documento a la mano antes de subir al colectivo.' },
+  { id:'p59', name:'Aeropuerto Coronel FAP Carlos Ciriani Santa Rosa', cat:'servicios', sub:'Aeropuerto', subEn:'Airport',
+    address:'A unos 6 km del centro de Tacna', lat:-18.0533, lng:-70.2758,
+    schedule:'Según programación de vuelos', scheduleEn:'According to flight schedule', openDays:[0,1,2,3,4,5,6],
+    history:'Aeropuerto internacional de Tacna, ubicado a unos 6 kilómetros del centro de la ciudad. Es la puerta de entrada aérea para los visitantes nacionales.',
+    bus:['Taxi','Colectivo aeropuerto'], price:'Según destino', priceEn:'Depends on destination', soles:0, rating:4.2,
+    tip:'Está cerca del centro: en taxi son unos 15 minutos sin tráfico.' }
 ];
 
 /* ---------- 4. LAS 6 RUTAS TURÍSTICAS ---------- */
@@ -401,9 +518,56 @@ const FOOD_TYPES = ['Tradicional Tacneña','Criolla','Marina','Parrillas','Comid
 /* ---------- 13. TIPOS DE CAMBIO REFERENCIALES ---------- */
 const FX = { PEN:1, CLP:255, BOB:1.85, USD:0.27 };
 
-/* ---------- 14. TRADUCCIONES DE INTERFAZ ---------- */
+
+/* ---------- 15. ZONAS: qué tan lejos está cada sitio del centro ---------- */
+const ZONES = [
+  { id:'ciudad', name:'En la ciudad', nameEn:'In the city', short:'Ciudad', shortEn:'City', color:'#C2182B' },
+  { id:'valle',  name:'Valle Viejo y alrededores', nameEn:'Old Valley & outskirts', short:'Valle Viejo', shortEn:'Old Valley', color:'#0E8F6B' },
+  { id:'costa',  name:'Litoral tacneño', nameEn:'Tacna coast', short:'Costa', shortEn:'Coast', color:'#1D6FD0' },
+  { id:'andes',  name:'Provincias altas', nameEn:'Highland provinces', short:'Provincias', shortEn:'Provinces', color:'#9A5B2E' }
+];
+
+const ZONE_OF = {
+  p5:'valle', p6:'valle', p7:'valle', p10:'valle', p19:'valle', p25:'valle',
+  p46:'costa', p47:'costa', p53:'costa',
+  p48:'andes', p52:'andes', p54:'andes', p55:'andes', p56:'andes', p57:'andes'
+};
+
+const TRAVEL = {
+  p5:'8 km · 20 min',      p6:'Km 22 · 40 min',   p7:'24 km · 45 min',
+  p10:'Pocollay · 20 min', p19:'Pocollay · 20 min', p25:'Calana · 30 min',
+  p46:'Ite · 1 h 30 min',  p47:'50 km · 1 h',     p53:'Camino a la costa · 45 min',
+  p48:'Candarave · 3 h',   p52:'Tarata · 1 h 30 min', p54:'80 km · 1 h 20 min',
+  p55:'80 km · 1 h 20 min', p56:'Tarata · 1 h 30 min', p57:'Jorge Basadre · 2 h'
+};
+
+PLACES.forEach(p => {
+  p.zone = ZONE_OF[p.id] || 'ciudad';
+  p.travel = TRAVEL[p.id] || null;
+});
+const zoneOf = id => ZONES.find(z => z.id === id) || ZONES[0];
+
+/* ---------- 16. TRADUCCIONES DE INTERFAZ ---------- */
 const I18N = {
   es:{
+    tour:'Mi Recorrido', tourStart:'Iniciar recorrido', tourActive:'Recorrido en curso',
+    tourNext:'Siguiente destino', tourArrived:'Ya llegué aquí', tourSkip:'Saltar este lugar',
+    tourFinish:'Terminar recorrido', tourDone:'¡Recorrido completado!', tourStop:'Parada',
+    tourOf:'de', optimize:'Ordenar por cercanía', moveUp:'Subir', moveDown:'Bajar',
+    useLocation:'Usar mi ubicación', locating:'Ubicando…', away:'de distancia',
+    locationOff:'Activa la ubicación para ver la distancia a cada parada.',
+    tourEmpty:'Elige los lugares que quieres visitar y la app trazará tu recorrido en el mapa.',
+    addPlaces:'Agregar lugares', myRoute:'Mi ruta en el mapa', stopsChosen:'paradas elegidas',
+    signIn:'Iniciar sesión', signUp:'Crear cuenta', email:'Correo', password:'Contraseña',
+    yourName:'Tu nombre', enter:'Entrar', createAccount:'Registrarme', signOut:'Cerrar sesión',
+    quickAccess:'Acceso rápido del equipo', noAccount:'¿No tienes cuenta?', haveAccount:'¿Ya tienes cuenta?',
+    wrongPass:'Correo o contraseña incorrectos', emailTaken:'Ese correo ya está registrado',
+    fillAll:'Completa todos los campos', badEmail:'Escribe un correo válido',
+    shortPass:'La contraseña debe tener al menos 6 caracteres', welcomeBack:'Bienvenido de vuelta',
+    accountCreated:'Cuenta creada', localNote:'Las cuentas se guardan en este dispositivo.',
+    switchAcc:'Cambiar de cuenta', accounts:'Cuentas en este dispositivo',
+    zone:'Zona', allZones:'Toda la región', travelTime:'Desde el centro',
+    inCity:'En la ciudad', dayTrip:'Salida de día',
     home:'Inicio', routes:'Rutas', explore:'Explorar', map:'Mapa', profile:'Perfil',
     welcome:'Bienvenido a Tacna', whatToday:'¿Qué descubrimos hoy',
     searchPh:'Buscar lugar, comida o línea de combi (ej. 2B)…',
@@ -445,6 +609,24 @@ const I18N = {
     nearby:'Sitios cercanos', filters:'Filtros', apply:'Aplicar'
   },
   en:{
+    tour:'My Trail', tourStart:'Start the trail', tourActive:'Trail in progress',
+    tourNext:'Next destination', tourArrived:'I am here', tourSkip:'Skip this stop',
+    tourFinish:'Finish trail', tourDone:'Trail completed!', tourStop:'Stop',
+    tourOf:'of', optimize:'Sort by distance', moveUp:'Up', moveDown:'Down',
+    useLocation:'Use my location', locating:'Locating…', away:'away',
+    locationOff:'Turn on location to see the distance to each stop.',
+    tourEmpty:'Pick the places you want to visit and the app will draw your trail on the map.',
+    addPlaces:'Add places', myRoute:'My trail on the map', stopsChosen:'stops chosen',
+    signIn:'Sign in', signUp:'Create account', email:'Email', password:'Password',
+    yourName:'Your name', enter:'Enter', createAccount:'Register', signOut:'Sign out',
+    quickAccess:'Team quick access', noAccount:'No account yet?', haveAccount:'Already have an account?',
+    wrongPass:'Wrong email or password', emailTaken:'That email is already registered',
+    fillAll:'Fill in every field', badEmail:'Enter a valid email',
+    shortPass:'The password needs at least 6 characters', welcomeBack:'Welcome back',
+    accountCreated:'Account created', localNote:'Accounts are stored on this device.',
+    switchAcc:'Switch account', accounts:'Accounts on this device',
+    zone:'Area', allZones:'Whole region', travelTime:'From downtown',
+    inCity:'In the city', dayTrip:'Day trip',
     home:'Home', routes:'Routes', explore:'Explore', map:'Map', profile:'Profile',
     welcome:'Welcome to Tacna', whatToday:'What shall we discover today',
     searchPh:'Search a place, food or bus line (e.g. 2B)…',

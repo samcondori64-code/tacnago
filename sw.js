@@ -1,5 +1,5 @@
 /* TacnaGo — service worker: permite usar la app sin conexión */
-const CACHE = 'tacnago-v1';
+const CACHE = 'tacnago-v2';
 const CORE = [
   './', './index.html', './styles.css', './data.js', './app.js', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png',
