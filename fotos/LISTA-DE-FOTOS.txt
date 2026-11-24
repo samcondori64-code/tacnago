@@ -1,0 +1,156 @@
+LISTA DE FOTOS — TacnaGo 2026
+============================================================
+
+Nombren cada archivo con el codigo que aparece a la izquierda.
+Ejemplo: la foto de la Catedral se llama  p1.jpg
+
+Formato .jpg horizontal, 1200-1600 px de ancho, menos de 400 KB.
+No hace falta tenerlas todas: las que falten siguen con su color.
+
+
+------------------------------------------------------------
+ATRACTIVOS TURÍSTICOS E HISTORIA  (15)
+------------------------------------------------------------
+  p1.jpg    Catedral de Tacna                          [En la ciudad]
+            Paseo Cívico de Tacna s/n
+  p2.jpg    Arco Parabólico y Paseo Cívico             [En la ciudad]
+            Paseo Cívico, Av. San Martín
+  p3.jpg    Museo Ferroviario Nacional                 [En la ciudad]
+            Av. Gregorio Albarracín 426
+  p4.jpg    Casa de Francisco Antonio de Zela          [En la ciudad]
+            Calle Zela 542
+  p5.jpg    Complejo Monumental Alto de la Alianza     [Valle Viejo]
+            Cerro Intiorko, 8 km al norte de Tacna
+  p6.jpg    Petroglifos de Miculla                     [Valle Viejo]
+            Km 22 carretera Tacna - Tarata (Pachía)
+  p7.jpg    Baños Termales de Calientes                [Valle Viejo]
+            Distrito de Pachía, a 24 km de Tacna
+  p8.jpg    Parque de la Locomotora                    [En la ciudad]
+            Av. Ramón Castilla con Av. Grau
+  p9.jpg    Museo Histórico Regional de Tacna          [En la ciudad]
+            Calle Apurímac 202
+  p10.jpg   Parque Perú / Bosque Municipal             [Valle Viejo]
+            Carretera Panamericana Sur, Pocollay
+  p40.jpg   Centro Cultural Casa Basadre               [En la ciudad]
+            Av. San Martín 212
+  p41.jpg   Casa Jurídica                              [En la ciudad]
+            Centro histórico de Tacna
+  p42.jpg   Teatro Municipal de Tacna                  [En la ciudad]
+            Pasaje Calderón de la Barca s/n, frente a la plaza MacLean
+  p43.jpg   Pileta Ornamental del Paseo Cívico         [En la ciudad]
+            Paseo Cívico de Tacna
+  p44.jpg   Alameda Bolognesi                          [En la ciudad]
+            Av. Bolognesi, centro de Tacna
+
+------------------------------------------------------------
+CAFETERÍAS  (7)
+------------------------------------------------------------
+  p11.jpg   La Cafeta                                  [En la ciudad]
+            Av. San Martín 520
+  p12.jpg   Café de la Casa                            [En la ciudad]
+            Calle Blondell 180
+  p13.jpg   El Café de Tacna                           [En la ciudad]
+            Calle Zela 610
+  p14.jpg   Qala Café de Especialidad                  [En la ciudad]
+            Av. Bolognesi 840
+  p15.jpg   Paccari Café y Repostería                  [En la ciudad]
+            Calle Bolívar 315
+  p16.jpg   Cafetería Los Portales                     [En la ciudad]
+            Paseo Cívico 110
+  p17.jpg   Aroma del Sur Coffee Bar                   [En la ciudad]
+            Av. Coronel Mendoza 1120
+
+------------------------------------------------------------
+RESTAURANTES  (8)
+------------------------------------------------------------
+  p18.jpg   El Rancho San Antonio                      [En la ciudad]
+            Av. Collpa s/n, a 5 min del centro
+  p19.jpg   La Glorieta                                [Valle Viejo]
+            Av. Celestino Vargas, Pocollay
+  p20.jpg   Tradiciones Tacneñas                       [En la ciudad]
+            Calle Zela 450
+  p21.jpg   Cevichería El Marisqueño                   [En la ciudad]
+            Av. Bolognesi 1200
+  p22.jpg   Fuego & Brasas Parrilladas                 [En la ciudad]
+            Calle San Martín 780
+  p23.jpg   El Huequito Tacneño                        [En la ciudad]
+            Calle Arias Aragüez 230
+  p24.jpg   El Pollo Dorado                            [En la ciudad]
+            Av. Bolognesi 320
+  p25.jpg   Sabores del Valle Viejo                    [Valle Viejo]
+            Carretera a Calana, Valle Viejo
+
+------------------------------------------------------------
+CENTROS COMERCIALES  (7)
+------------------------------------------------------------
+  p26.jpg   Mercadillo Bolognesi                       [En la ciudad]
+            Av. Coronel Mendoza 1105
+  p27.jpg   C.C. Polvos Rosados                        [En la ciudad]
+            Av. Pinto 120
+  p28.jpg   C.C. Túpac Amaru                           [En la ciudad]
+            Av. Coronel Mendoza 950
+  p29.jpg   C.C. Leguía / Plaza Vea                    [En la ciudad]
+            Av. Augusto B. Leguía 1020
+  p30.jpg   Galería Coronel Mendoza                    [En la ciudad]
+            Av. Coronel Mendoza 1250
+  p31.jpg   C.C. Solari Plaza                          [En la ciudad]
+            Av. San Martín 480
+  p32.jpg   C.C. Tacna Centro                          [En la ciudad]
+            Av. Bolognesi 560
+
+------------------------------------------------------------
+FERIAS Y CACHINAS  (8)
+------------------------------------------------------------
+  p33.jpg   Feria Boliviana                            [En la ciudad]
+            Zona del Parque Industrial, Av. Industrial
+  p34.jpg   La Cachina de Tacna / Feria Grau           [En la ciudad]
+            Av. Ramón Castilla / Av. Grau s/n
+  p35.jpg   Feria La Agronómica / Mercado Grau         [En la ciudad]
+            Av. Industrial 500
+  p36.jpg   Feria 28 de Agosto                         [En la ciudad]
+            Distrito Coronel Gregorio Albarracín Lanchipa
+  p37.jpg   Feria Altiplano                            [En la ciudad]
+            Distrito Alto de la Alianza
+  p38.jpg   Feria Dominical Gregorio Albarracín        [En la ciudad]
+            Av. Municipal s/n, Gregorio Albarracín
+  p39.jpg   Feria Artesanal del Paseo Cívico           [En la ciudad]
+            Paseo Cívico de Tacna
+  p45.jpg   Mercado Central de Tacna                   [En la ciudad]
+            Centro de Tacna
+
+------------------------------------------------------------
+NATURALEZA Y AVENTURA  (5)
+------------------------------------------------------------
+  p46.jpg   Humedales de Ite                           [Costa]
+            Desembocadura del río Locumba, distrito de Ite
+  p47.jpg   Balneario de Boca del Río                  [Costa]
+            Desembocadura del río Sama, distrito de Sama
+  p48.jpg   Laguna de Aricota                          [Provincias]
+            Provincia de Candarave, 2 800 msnm
+  p52.jpg   Cataratas de Conchachiri                   [Provincias]
+            Provincia de Tarata
+  p53.jpg   Valle de Sama                              [Costa]
+            Distrito de Sama, camino al litoral
+
+------------------------------------------------------------
+PROVINCIAS Y PUEBLOS  (4)
+------------------------------------------------------------
+  p54.jpg   Tarata y sus Andenerías                    [Provincias]
+            Provincia de Tarata, a unos 80 km de Tacna
+  p55.jpg   Catedral de Tarata                         [Provincias]
+            Plaza principal de Tarata
+  p56.jpg   Baños Termales de Ticaco                   [Provincias]
+            Distrito de Ticaco, provincia de Tarata
+  p57.jpg   Iglesia San Pedro de Ilabaya               [Provincias]
+            Distrito de Ilabaya, provincia Jorge Basadre
+
+------------------------------------------------------------
+LLEGADA Y SERVICIOS  (2)
+------------------------------------------------------------
+  p58.jpg   Terminal Terrestre Internacional Manuel A. [En la ciudad]
+            Carretera Panamericana Sur, Tacna
+  p59.jpg   Aeropuerto Coronel FAP Carlos Ciriani Sant [En la ciudad]
+            A unos 6 km del centro de Tacna
+
+============================================================
+Total: 56 sitios

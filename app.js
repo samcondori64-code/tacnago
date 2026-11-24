@@ -152,7 +152,8 @@ function save(){
     localStorage.setItem(KEY, JSON.stringify({
       lang:S.lang, theme:S.theme, user:S.user, accounts:S.accounts, profiles:S.profiles
     }));
-  }catch(e){}
+    return true;
+  }catch(e){ return false; }   // normalmente: se llenó el almacenamiento del navegador
 }
 
 const me = () => S.profiles[S.user] || defaultProfile();
@@ -298,9 +299,9 @@ const CATART = {
   provincias:{ g:['#6B3C15','#9A5B2E','#4F2E12'], glyph:'village' },
   servicios:{ g:['#2C3A4F','#50607A','#1F2938'], glyph:'bus' }
 };
-function headerArt(p, h=120){
-  const photo = (me().photos||{})[p.id];
-  if(photo) return `<img class="phimg" src="${photo}" alt=""><div class="shade"></div>`;
+const PHOTO_MISS = new Set();   // lugares que aún no tienen foto en la carpeta fotos/
+
+function headerArt(p, h=150){
   const a = CATART[p.cat] || CATART.atractivos;
   const seed = parseInt(p.id.slice(1),10) || 1;
   const ang = 110 + (seed % 7) * 11;
@@ -312,9 +313,28 @@ function headerArt(p, h=120){
     `radial-gradient(120% 130% at ${12+(seed%6)*14}% -10%, ${a.g[0]} 0%, rgba(0,0,0,0) 62%),`,
     `linear-gradient(${ang}deg, ${a.g[1]} 0%, ${a.g[2]} 100%)`
   ].join(' ');
-  return `<div class="phimg" style="${style};filter:hue-rotate(${hue}deg) saturate(${1 + (seed%3)*0.08})"></div>
-    <div class="shade"></div>
-    <div class="glyph" style="color:rgba(255,255,255,.34)">${ico(a.glyph, h>140 ? 66 : 50)}</div>`;
+
+  const base = `<div class="phimg" style="${style};filter:hue-rotate(${hue}deg) saturate(${1 + (seed%3)*0.08})"></div>`;
+  const glyph = `<div class="glyph" style="color:rgba(255,255,255,.34)">${ico(a.glyph, h>170 ? 66 : 50)}</div>`;
+
+  // 1º la foto que el usuario cargó en su celular, 2º la foto oficial del repositorio
+  const mine = (me().photos || {})[p.id];
+  const src = mine || (PHOTO_MISS.has(p.id) ? null : `fotos/${p.id}.jpg`);
+
+  if(src){
+    return base + glyph +
+      `<img class="phimg realphoto" src="${src}" alt="" loading="lazy" decoding="async"
+            onload="this.classList.add('loaded')" onerror="photoMiss(this,'${p.id}')">` +
+      `<div class="shade"></div>`;
+  }
+  return base + glyph + `<div class="shade"></div>`;
+}
+
+/* Si no existe fotos/pX.jpg prueba .png, y si tampoco está se queda el degradado */
+function photoMiss(el, id){
+  if(el.dataset.alt !== '1'){ el.dataset.alt = '1'; el.src = 'fotos/' + id + '.png'; return; }
+  PHOTO_MISS.add(id);
+  el.remove();
 }
 
 /* ---------------- FILTRADO ---------------- */
@@ -448,7 +468,7 @@ function renderHeader(){
         </div>
       </div>
       <div class="avrow">
-        ${Object.values(S.accounts).slice(0,4).map(x=>`<button class="av ${x.email===S.user?'on':''}"
+        ${[meUser(), ...Object.values(S.accounts).filter(a=>a.email!==S.user)].slice(0,4).map(x=>`<button class="av ${x.email===S.user?'on':''}"
             style="background:${x.color}" onclick="switchUser('${x.email}')" title="${esc(x.fullName||x.name)}">
             ${x.avatar}${x.email===S.user?'<i class="dot"></i>':''}</button>`).join('')}
       </div>
@@ -535,8 +555,8 @@ function screenHome(){
     <div>
       <div class="sec-h"><h2>${ico('layers',15)} ${t('directory')}</h2><span class="cnt">${PLACES.length} ${t('sites')}</span></div>
       <div class="catgrid">
-        ${CATEGORIES.map((c,i)=>`
-          <button class="cat ${i===0?'wide':''}" style="--c:${c.color}" onclick="S.cat='${c.id}';S.food='all';go('explore')">
+        ${CATEGORIES.map(c=>`
+          <button class="cat" style="--c:${c.color}" onclick="S.cat='${c.id}';S.food='all';go('explore')">
             <div class="ci">${ico(c.icon,19)}</div>
             <span class="cc">${PLACES.filter(x=>x.cat===c.id).length}</span>
             <div class="cn">${catName(c)}</div>
@@ -979,7 +999,7 @@ function renderModal(){
           <h4 style="color:var(--blue)">${ico('bus',13)} ${t('buses')}</h4>
           <div class="zoneline" style="margin:0 0 9px">
             <span class="zb" style="--zc:${zoneOf(p.zone).color}">${ico(p.zone==='ciudad'?'foot':'bus',10)} ${EN()?zoneOf(p.zone).nameEn:zoneOf(p.zone).name}</span>
-            <span>${t('travelTime')}: ${p.travel ? esc(p.travel) : t('inCity')}</span>
+            <span>${p.travel ? t('travelTime')+': '+esc(p.travel) : t('inCity')}</span>
           </div>
           <div class="buses" style="margin:0">
             ${p.bus.map(b=>`<span class="bus" style="font-size:11px;padding:5px 9px">${esc(b)}</span>`).join('')}
@@ -1002,6 +1022,10 @@ function renderModal(){
           ${ico('camera',14)} ${EN()?'Add my photo':'Agregar mi foto'}
           <input type="file" accept="image/*" style="display:none" onchange="addPhoto('${p.id}',this)">
         </label>
+        <div class="note">${ico('info',13)}<span>${EN()
+          ? 'Official team photo for this place: upload it to the repository as'
+          : 'Foto oficial del equipo para este sitio: súbanla al repositorio como'}
+          <b style="color:var(--amber);font-family:ui-monospace,monospace">fotos/${p.id}.jpg</b></span></div>
 
         <div class="block">
           <h4>${ico('star',12)} ${t('reviews')} (${revs.length})</h4>
@@ -1103,21 +1127,37 @@ function locateOnMap(id){
 function addPhoto(id, input){
   const f = input.files && input.files[0]; if(!f) return;
   const rd = new FileReader();
-  rd.onload = e=>{
-    // redimensionar para no llenar el almacenamiento
+  rd.onload = ev => {
     const img = new Image();
-    img.onload = ()=>{
-      const cv = document.createElement('canvas');
-      const W = 640, H = Math.round(img.height * (W/img.width));
-      cv.width = W; cv.height = H;
-      cv.getContext('2d').drawImage(img,0,0,W,H);
-      try{
-        me().photos[id] = cv.toDataURL('image/jpeg',.72);
-        save(); renderModal(); render();
-        toast(EN()?'Photo saved':'Foto guardada','good');
-      }catch(err){ toast(EN()?'Could not save the photo':'No se pudo guardar la foto'); }
+    img.onload = () => {
+      // se intenta la mejor calidad y se va bajando hasta que entre en el almacenamiento
+      const pasos = [[1600,.86],[1280,.84],[1024,.80],[800,.74],[640,.66]];
+      const previa = me().photos[id];
+      for(const [maxW, q] of pasos){
+        const escala = Math.min(1, maxW / img.width);
+        const cv = document.createElement('canvas');
+        cv.width  = Math.max(1, Math.round(img.width  * escala));
+        cv.height = Math.max(1, Math.round(img.height * escala));
+        const ctx = cv.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        let datos;
+        try{ datos = cv.toDataURL('image/jpeg', q); }catch(err){ continue; }
+        me().photos[id] = datos;
+        if(save()){
+          renderModal(); render();
+          toast((EN()?'Photo saved':'Foto guardada') + ' · ' + cv.width + 'px', 'good');
+          return;
+        }
+      }
+      // no entró ni en la calidad más baja: se deja todo como estaba
+      if(previa === undefined) delete me().photos[id]; else me().photos[id] = previa;
+      save(); renderModal();
+      toast(EN() ? 'No space left on this device for more photos'
+                 : 'Este dispositivo ya no tiene espacio para más fotos');
     };
-    img.src = e.target.result;
+    img.src = ev.target.result;
   };
   rd.readAsDataURL(f);
 }
@@ -1658,6 +1698,8 @@ function answer(qRaw){
   const q = qRaw.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const has = (...w)=> w.some(x=>q.includes(x));
+  // coincidencia por palabra completa: evita que "grandes" active "andes"
+  const word = (...w)=> w.some(x=> new RegExp('(^|[^a-z0-9])' + x + '([^a-z0-9]|$)').test(q));
   const DAYS = EN()? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
                    : ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 
@@ -1756,6 +1798,25 @@ function answer(qRaw){
     return (EN()?`You earn ${POINTS.visit} points per stamp, ${POINTS.review} per review and ${POINTS.route} for completing a whole route. Exchange them for coupons in the Points & coupons section. You have <b>${me().points}</b> points.`
                :`Ganas ${POINTS.visit} puntos por sello, ${POINTS.review} por reseña y ${POINTS.route} por completar una ruta entera. Cámbialos por cupones en la sección Puntos y cupones. Tienes <b>${me().points}</b> puntos.`);
   }
+  // naturaleza, playa y costa
+  if(has('playa','beach','humedal','laguna','catarata','naturaleza','nature','boca del rio','costa','litoral') || word('ite')){
+    const n = PLACES.filter(p=>p.cat==='naturaleza');
+    return (EN()?'Nature and coast around Tacna:<br>':'Naturaleza y costa de Tacna:<br>')
+      + listOf(n, p=>`${p.travel || t('inCity')} · 🚍 ${p.bus[0]}`);
+  }
+  // provincias y pueblos andinos
+  if(has('tarata','ticaco','ilabaya','provincia','pueblo','andeneria','andenería','candarave','aricota') || word('andes','andino')){
+    const pr = PLACES.filter(p=>p.cat==='provincias' || p.zone==='andes');
+    return (EN()?'Andean towns and provinces:<br>':'Provincias y pueblos andinos:<br>')
+      + listOf(pr, p=>`${p.travel || ''} · 🚍 ${p.bus[0]}`);
+  }
+  // llegada: terminal y aeropuerto
+  if(has('aeropuerto','airport','terminal','vuelo','flight','llegar a tacna','arrive')){
+    const sv = PLACES.filter(p=>p.cat==='servicios');
+    return (EN()?'Arrival points in Tacna:<br>':'Puntos de llegada a Tacna:<br>')
+      + listOf(sv, p=>`${esc(p.address)} · 🚍 ${p.bus.slice(0,2).join(', ')}`);
+  }
+
   // búsqueda genérica
   const hits = PLACES.filter(p=>{
     const n = (p.name+' '+p.sub+' '+p.history+' '+p.address).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');

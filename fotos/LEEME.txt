@@ -1,0 +1,22 @@
+CARPETA DE FOTOS — TacnaGo 2026
+================================
+
+Pongan aquí las fotos reales que tomen en Tacna.
+
+REGLA ÚNICA: el archivo se llama igual que el código del sitio.
+
+    fotos/p1.jpg   ->  Catedral de Tacna
+    fotos/p2.jpg   ->  Arco Parabólico y Paseo Cívico
+    fotos/p18.jpg  ->  El Rancho San Antonio
+
+El código de cada sitio aparece dentro de la app, en su propia
+ficha, debajo del botón "Agregar mi foto".
+
+RECOMENDACIONES
+- Formato .jpg (también acepta .png)
+- Horizontal (apaisada), más ancha que alta
+- Entre 1200 y 1600 píxeles de ancho
+- Menos de 400 KB por foto, para que cargue rápido
+
+No hace falta subir las 56 de una vez. Los sitios sin foto siguen
+mostrando su degradado de color y la app funciona igual.

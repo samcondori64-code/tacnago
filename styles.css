@@ -527,3 +527,28 @@ nav.bot span{font-size:9.5px;font-weight:700}
   color:var(--zc);background:color-mix(in srgb,var(--zc) 15%,transparent);
   border:1px solid color-mix(in srgb,var(--zc) 40%,transparent)}
 [data-theme="light"] .zb{color:color-mix(in srgb,var(--zc) 78%,black)}
+
+/* ===== Fotografías reales sobre la portada de categoría ===== */
+.ph{height:150px}
+.sheethead{height:200px}
+.phimg{z-index:0}
+.glyph{z-index:1}
+.shade{z-index:3}
+.phimg.realphoto{
+  z-index:2; opacity:0; transform:scale(1.03);
+  transition:opacity .35s ease, transform .45s ease;
+}
+.phimg.realphoto.loaded{opacity:1;transform:scale(1)}
+.place:active .phimg.realphoto.loaded{transform:scale(1.04)}
+.shade{background:linear-gradient(to top,
+  rgba(8,10,16,.88) 0%, rgba(8,10,16,.24) 50%, rgba(8,10,16,.2) 100%)}
+.ph .foot h4{font-size:15px;letter-spacing:-.2px;text-shadow:0 2px 12px rgba(0,0,0,.85)}
+.sheethead h2{font-size:21px;letter-spacing:-.3px}
+.chip{background:rgba(12,14,20,.72);border:1px solid rgba(255,255,255,.22)}
+.rate{background:rgba(12,14,20,.78);border:1px solid rgba(255,210,125,.35)}
+/* el texto va por encima del velo oscuro, no debajo */
+.chips{z-index:4}
+.ph .foot{z-index:4}
+.stampmark{z-index:5}
+.sheethead .ht{z-index:4}
+.sheethead .closer{z-index:6}
