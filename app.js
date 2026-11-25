@@ -1357,7 +1357,7 @@ function viewTour(){
         ${ico('play',15)} ${t('tourStart')} (${list.length} ${t('stops').toLowerCase()})</button>`
       : `<button class="btn ghost" onclick="endTour()">${ico('x',14)} ${t('tourFinish')}</button>`}
 
-    ${S.geoState!=='ok' ? `<button class="btn ghost" onclick="locate()">
+    ${(S.geoState!=='ok' && !active) ? `<button class="btn ghost" onclick="locate()">
         ${ico('target',14)} ${S.geoState==='wait'? t('locating') : t('useLocation')}</button>` : ''}
 
     <div class="stack">

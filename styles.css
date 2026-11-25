@@ -1,3 +1,11 @@
+/* ===== Tipografía Outfit incluida en la app: funciona sin internet ===== */
+@font-face{font-family:'Outfit';font-style:normal;font-weight:400;font-display:swap;src:url('vendor/fonts/outfit-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:500;font-display:swap;src:url('vendor/fonts/outfit-latin-500-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:600;font-display:swap;src:url('vendor/fonts/outfit-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:700;font-display:swap;src:url('vendor/fonts/outfit-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:800;font-display:swap;src:url('vendor/fonts/outfit-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:900;font-display:swap;src:url('vendor/fonts/outfit-latin-900-normal.woff2') format('woff2')}
+
 /* ===== TacnaGo 2026 — hoja de estilos ===== */
 :root{
   --crimson:#C2182B; --crimson-d:#8E0F1E; --crimson-l:#E14256;

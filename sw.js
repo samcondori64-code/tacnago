@@ -4,7 +4,13 @@ const KEEP = ['tacnago-tiles', 'tacnago-fotos'];
 const CORE = [
   './', './index.html', './styles.css', './data.js', './app.js', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable.png',
-  './vendor/leaflet.css', './vendor/leaflet.js'
+  './vendor/leaflet.css', './vendor/leaflet.js',
+  './vendor/fonts/outfit-latin-400-normal.woff2',
+  './vendor/fonts/outfit-latin-500-normal.woff2',
+  './vendor/fonts/outfit-latin-600-normal.woff2',
+  './vendor/fonts/outfit-latin-700-normal.woff2',
+  './vendor/fonts/outfit-latin-800-normal.woff2',
+  './vendor/fonts/outfit-latin-900-normal.woff2'
 ];
 
 self.addEventListener('install', e=>{
